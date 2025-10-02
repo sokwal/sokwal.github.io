@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>masrep - Dangerous User Elimination System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .shield {
+            width: 48px;
+            height: 48px;
+            background: #fff;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .tagline {
+            color: #888;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status-card {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .status-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .status-icon.success {
+            background: #fff;
+            color: #000;
+        }
+
+        .status-icon.error {
+            background: #fff;
+            color: #000;
+        }
+
+        .status-icon.info {
+            background: #fff;
+            color: #000;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-message {
+            color: #888;
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-grid {
+            display: grid;
+            gap: 1rem;
+            text-align: left;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            border-radius: 8px;
+        }
+
+        .info-label {
+            color: #888;
+            font-size: 0.875rem;
+        }
+
+        .info-value {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background: #fff;
+            color: #000;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: 2px solid #fff;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background: #000;
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #fff;
+            border: 2px solid #333;
+        }
+
+        .btn-secondary:hover {
+            border-color: #fff;
+            background: #111;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #555;
+            font-size: 0.875rem;
+            border-top: 1px solid #222;
+        }
+
+        .home-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .endpoint-card {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .endpoint-card:hover {
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .endpoint-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .endpoint-desc {
+            color: #888;
+            margin-bottom: 1rem;
+        }
+
+        .endpoint-url {
+            font-family: 'Courier New', monospace;
+            color: #fff;
+            background: #0a0a0a;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .status-card {
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Home Page -->
+        <div id="home" class="page active">
+            <header>
+                <div class="logo">
+                    <div class="shield"></div>
+                    <h1>masrep</h1>
+                </div>
+                <p class="tagline">Dangerous User Elimination System</p>
+            </header>
+
+            <div class="home-grid">
+                <div class="endpoint-card" onclick="showPage('success')">
+                    <h3 class="endpoint-title">Success URL</h3>
+                    <p class="endpoint-desc">Redirect URL for successful payments</p>
+                    <div class="endpoint-url">/success</div>
+                </div>
+
+                <div class="endpoint-card" onclick="showPage('fail')">
+                    <h3 class="endpoint-title">Fail URL</h3>
+                    <p class="endpoint-desc">Redirect URL for failed payments</p>
+                    <div class="endpoint-url">/fail</div>
+                </div>
+
+                <div class="endpoint-card" onclick="showPage('result')">
+                    <h3 class="endpoint-title">Result URL</h3>
+                    <p class="endpoint-desc">Postback URL for payment results</p>
+                    <div class="endpoint-url">/result</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Page -->
+        <div id="success" class="page">
+            <div class="status-card">
+                <div class="status-icon success">✓</div>
+                <h2>Payment Successful</h2>
+                <p class="status-message">Your transaction has been completed successfully</p>
+                
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="info-label">Transaction ID</span>
+                        <span class="info-value">TXN-2025-4892</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Amount</span>
+                        <span class="info-value">$49.99</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Status</span>
+                        <span class="info-value">Completed</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Date</span>
+                        <span class="info-value">Feb 10, 2025</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-links">
+                <button class="btn" onclick="showPage('home')">Back to Home</button>
+            </div>
+        </div>
+
+        <!-- Fail Page -->
+        <div id="fail" class="page">
+            <div class="status-card">
+                <div class="status-icon error">✕</div>
+                <h2>Payment Failed</h2>
+                <p class="status-message">Your transaction could not be processed</p>
+                
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="info-label">Transaction ID</span>
+                        <span class="info-value">TXN-2025-4893</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Error Code</span>
+                        <span class="info-value">ERR_DECLINED</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Reason</span>
+                        <span class="info-value">Insufficient funds</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Date</span>
+                        <span class="info-value">Feb 10, 2025</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-links">
+                <button class="btn" onclick="showPage('home')">Back to Home</button>
+                <button class="btn-secondary btn">Try Again</button>
+            </div>
+        </div>
+
+        <!-- Result Page -->
+        <div id="result" class="page">
+            <div class="status-card">
+                <div class="status-icon info">i</div>
+                <h2>Payment Result</h2>
+                <p class="status-message">Transaction information for postback processing</p>
+                
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="info-label">Transaction ID</span>
+                        <span class="info-value">TXN-2025-4894</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Amount</span>
+                        <span class="info-value">$49.99</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Status</span>
+                        <span class="info-value">Processing</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Payment Method</span>
+                        <span class="info-value">Credit Card</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Customer ID</span>
+                        <span class="info-value">CUST-8472</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Date</span>
+                        <span class="info-value">Feb 10, 2025</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-links">
+                <button class="btn" onclick="showPage('home')">Back to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 masrep. Dangerous User Elimination System.</p>
+    </footer>
+
+    <script>
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update URL hash
+            window.location.hash = pageId;
+        }
+
+        // Handle browser back/forward buttons
+        window.addEventListener('hashchange', function() {
+            const hash = window.location.hash.substring(1) || 'home';
+            showPage(hash);
+        });
+
+        // Load correct page on initial load
+        window.addEventListener('load', function() {
+            const hash = window.location.hash.substring(1) || 'home';
+            showPage(hash);
+        });
+    </script>
+</body>
+</html>
